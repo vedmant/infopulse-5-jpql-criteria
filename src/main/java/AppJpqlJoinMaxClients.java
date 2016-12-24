@@ -1,13 +1,11 @@
-import entity.Bank;
-import entity.Client;
+import entity.Result;
 import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import java.util.ArrayList;
 import java.util.List;
 
-public class AppJpql {
+public class AppJpqlJoinMaxClients {
 
     public static void main(String[] args) {
         SessionFactory sessionFactory = (SessionFactory) Persistence.createEntityManagerFactory("org.hibernate.tutorial.jpa");
@@ -15,21 +13,17 @@ public class AppJpql {
         entityManager.getTransaction().begin();
 
         /**
-         * Select all
+         * Where statement with join
          */
-        List<Client> clients = entityManager.createQuery("from entity.Client", Client.class).getResultList();
-
-        clients.forEach(client -> System.out.println(client.getTotalSum()));
-
-        /**
-         * Where statement
-         */
-        List<Client> clients2 = entityManager.createQuery("from entity.Client c where c.id = :id", Client.class)
-                .setParameter("id", 11l)
+        List<Result> banksList = entityManager
+                .createQuery("select b.name, count(b.clients) " +
+                        "from entity.Bank b " +
+                        "join b.clients " +
+                        "group by b.name " +
+                        "order by count(b.clients) desc", Result.class)
                 .getResultList();
 
-        clients2.forEach(client -> System.out.println(client.getTotalSum()));
-
+        banksList.forEach(bank -> System.out.println(bank.getName() + ": " + bank.getCount()));
 
         entityManager.getTransaction().commit();
 
