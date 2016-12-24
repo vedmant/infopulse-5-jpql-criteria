@@ -7,7 +7,7 @@ import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App {
+public class AppJpql {
 
     public static void main(String[] args) {
         SessionFactory sessionFactory = (SessionFactory) Persistence.createEntityManagerFactory("org.hibernate.tutorial.jpa");
@@ -70,9 +70,22 @@ public class App {
 
         entityManager2.getTransaction().begin();
 
+        /**
+         * Select all
+         */
         List<Client> clients = entityManager2.createQuery("from entity.Client", Client.class).getResultList();
 
         clients.forEach(client -> System.out.println(client.getTotalSum()));
+
+        /**
+         * Where statement
+         */
+        List<Client> clients2 = entityManager2.createQuery("from entity.Client c where c.id = :id", Client.class)
+                .setParameter("id", 11l)
+                .getResultList();
+
+        clients2.forEach(client -> System.out.println(client.getTotalSum()));
+
 
         entityManager2.getTransaction().commit();
 
